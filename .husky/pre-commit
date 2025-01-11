@@ -1,3 +1,10 @@
 # PSR-12 format with Laravel Pint
 ./vendor/bin/pint --preset psr12
 
+# PHPMD
+files=$(git diff --cached --name-only --diff-filter=AMCR | grep "\.php$" || true)
+
+for file in $files
+do
+    ./vendor/bin/phpmd "$file" text controversial
+done
