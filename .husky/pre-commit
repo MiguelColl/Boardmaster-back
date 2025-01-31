@@ -1,10 +1,14 @@
-# PSR-12 format with Laravel Pint
-./vendor/bin/pint --preset psr12
+#!/bin/bash
 
-# PHPMD
 files=$(git diff --cached --name-only --diff-filter=AMCR | grep "\.php$" || true)
 
+# PSR-12 format with Laravel Pint
+./vendor/bin/pint --preset psr12 $files && git add $files
+
+# PHPMD
 for file in $files
 do
     ./vendor/bin/phpmd "$file" text controversial
 done
+
+php artisan test --filter ArchTest

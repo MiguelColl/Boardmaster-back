@@ -35,4 +35,17 @@ return [
         ],
     ],
 
+    'elastic' => [
+        'enabled' => env('ELASTICSEARCH_ENABLED', false),
+        'hosts' => explode(',', env('ELASTICSEARCH_HOSTS')),
+    ],
+
+    'paypal' => [
+        'clientID' => env('PAYPAL_CLIENT_ID', ''),
+        'secret' => env('PAYPAL_SECRET', ''),
+    ],
+
+    'ngrok' => [
+        'url' => env('NGROK_URL', ''),
+    ],
 ];

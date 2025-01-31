@@ -1,0 +1,55 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Services\Paypal;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
+
+class PaypalController extends Controller
+{
+    public function payment(Request $request)
+    {
+        $paypal = new Paypal();
+
+        $invoice = Str::random();
+        $total = 10.00;
+        $ngrok = config('services.ngrok.url');
+        $return = $ngrok . '/return';
+        $cancel = $ngrok . '/cancel';
+        $result = $paypal->createOrder($invoice, $total, $return, $cancel);
+
+        $id = data_get($result, 'id');
+        Cache::put('order_paypal', $id);
+
+        $url = head(
+            array_values(
+                array_filter(
+                    $result['links'],
+                    function ($value) {
+                        return ($value['rel'] == 'approve');
+                    }
+                )
+            )
+        );
+
+        $urlRedirect = $url['href'];
+
+        return Redirect::to($urlRedirect);
+    }
+
+    public function return(Request $request)
+    {
+        $token = $request->get('token');
+        $payer = $request->get('PayerID');
+        $paypal = new Paypal();
+        return $paypal->confirmOrder($token);
+    }
+
+    public function cancel(Request $request)
+    {
+        return 'funciono';
+    }
+}
