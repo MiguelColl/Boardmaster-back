@@ -31,11 +31,18 @@ class EmailController extends Controller
      */
     public function store(Request $request)
     {
+        $request-> validate([
+            'from' => 'required|email',
+            'to' => 'required|email',
+            'subject' => 'required|max:255',
+            'body' => 'required|max:255',
+        ]);
+
         Email::create([
-            'from' => $request->input('from', ''),
-            'to' => $request->input('to', ''),
-            'subject' => $request->input('subject', ''),
-            'body' => $request->input('body', ''),
+            'from' => $request->input('from'),
+            'to' => $request->input('to'),
+            'subject' => $request->input('subject'),
+            'body' => $request->input('body'),
         ]);
         return redirect()->route('emails.index');
     }
@@ -67,12 +74,19 @@ class EmailController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $request-> validate([
+            'from' => 'required|email',
+            'to' => 'required|email',
+            'subject' => 'required|max:255',
+            'body' => 'required|max:255',
+        ]);
+
         $email = Email::find($id);
 
-        $email->from = $request->input('from', '');
-        $email->to = $request->input('to', '');
-        $email->subject = $request->input('subject', '');
-        $email->body = $request->input('body', '');
+        $email->from = $request->input('from');
+        $email->to = $request->input('to');
+        $email->subject = $request->input('subject');
+        $email->body = $request->input('body');
         $email->save();
 
         return redirect()->route('emails.index');
