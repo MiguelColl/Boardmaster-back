@@ -14,8 +14,28 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         DB::table('categories')->delete();
-        for ($i = 0; $i < 10; $i++) {
+
+        for ($i = 0; $i < 5; $i++) {
             Category::factory()->create();
+        }
+
+        $categoriesBase = Category::all();
+        foreach ($categoriesBase as $categoryBase) {
+            $this->generateRandomChilds($categoryBase);
+        }
+    }
+
+    public function generateRandomChilds($categoryBase, $subLevel = true)
+    {
+        $rand = rand(0, 3);
+        for ($i = 0; $i < $rand; $i++) {
+            $category = Category::factory()->create();
+            $category->path = "$categoryBase->path.$category->path";
+            $category->save();
+
+            if ($subLevel) {
+                $this->generateRandomChilds($category, false);
+            }
         }
     }
 }

@@ -2,10 +2,15 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ProductModel extends Model
 {
+    use HasFactory;
+
     protected $table = 'product_models';
     protected $guarded = [];
 
@@ -22,5 +27,18 @@ class ProductModel extends Model
             'name' => $this->name,
             'brand' => $this->brand,
         ];
+    }
+
+    public function scopeFilterByNews(Builder $query)
+    {
+        $query->whereBetween('created_at', [
+            Carbon::now()->subMonth()->startOfDay(),
+            Carbon::now()->endOfDay()
+        ]);
+    }
+
+    public function scopeActive(Builder $query)
+    {
+        $query->where('active', true);
     }
 }

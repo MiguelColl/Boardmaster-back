@@ -17,16 +17,14 @@ class CategoryFactory extends Factory
      */
     public function definition(): array
     {
-        $faker = \Faker\Factory::create();
-        $faker->addProvider(new \Bezhanov\Faker\Provider\Commerce($faker));
-
         do {
-            $code = strtolower($faker->category);
+            // Commerce faker can only generate 22 different categories
+            $code = Category::count('id') < 22 ? strtolower(fake()->category()) : strtolower(fake()->category() . '-' . fake()->category());
         } while (Category::where('code', $code)->exists());
 
         return [
             'code' => $code,
-            'name' => $faker->department,
+            'name' => fake()->department(),
             'description' => fake()->sentence(),
             'node_type' => 'category',
             'url' => fake()->url(),

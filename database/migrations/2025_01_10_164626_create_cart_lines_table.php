@@ -17,12 +17,12 @@ return new class () extends Migration {
             $table->foreignId('cart_id')->constrained()->nullOnDelete();
             $table->foreignId('product_variant_id')->constrained()->nullOnDelete();
             $table->integer('units');
-            $table->double('total_price');
-            $table->double('total_price_per_unit');
-            $table->double('total_base_price');
-            $table->double('total_base_price_per_unit');
-            $table->double('total_tax');
-            $table->double('total_tax_per_unit');
+            $table->decimal('total_price', 8, 2);
+            $table->decimal('total_price_per_unit', 8, 2);
+            $table->decimal('total_base_price', 8, 2);
+            $table->decimal('total_base_price_per_unit', 8, 2);
+            $table->decimal('total_tax', 8, 2);
+            $table->decimal('total_tax_per_unit', 8, 2);
             $table->timestampsTz();
         });
     }

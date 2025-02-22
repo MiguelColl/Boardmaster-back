@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AcceptJson;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -21,9 +22,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
         ]);
 
-        $middleware->web(remove: [
-            ValidateCsrfToken::class,
-        ]);
+        $middleware->web(
+            remove: [
+                ValidateCsrfToken::class,
+            ],
+            prepend: [
+                AcceptJson::class,
+            ]
+        );
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
