@@ -23,13 +23,13 @@ class ProductSeeder extends Seeder
         DB::table('product_variants')->delete();
         DB::table('product_models')->delete();
 
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 80; $i++) {
             $model = ProductModel::factory()->create();
 
             $this->generateVariants($model);
 
-            $categories = Category::all();
-            $catNumber = rand(5, count($categories));
+            $categories = Category::where('node_type', 'category')->orderBy('id')->get();
+            $catNumber = rand(5, count($categories) - 1);
 
             Category::create([
                 'code' => $model->code,
