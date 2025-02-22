@@ -51,7 +51,10 @@ Route::delete('/newsletter', [NewsletterController::class, 'destroy']);
 Route::get('/category/{id}', [CategoryController::class, 'show']);
 Route::post('/category/byUrl', [CategoryController::class, 'showByUrl']);
 
-Route::prefix('model')->group(function () {
+Route::prefix('product')->group(function () {
+    Route::get('/', [ProductModelController::class, 'index']);
+    Route::get('/news', [ProductModelController::class, 'filterNewProducts']);
+
     Route::get('/{id}', [ProductModelController::class, 'show']);
     Route::post('/byUrl', [ProductModelController::class, 'showByUrl']);
 

@@ -2,8 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ProductModel;
+
 class ProductModelController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $products = ProductModel::active()->get();
+        return response()->json(
+            [
+                'error' => false,
+                'data' => $products,
+            ],
+            200
+        );
+    }
+
     /**
      * Display the specified resource.
      */
@@ -59,6 +76,18 @@ class ProductModelController extends Controller
             [
                 'error' => false,
                 'msg' => 'Store a product model comment'
+            ],
+            201
+        );
+    }
+
+    public function filterNewProducts()
+    {
+        $products = ProductModel::filterByNews()->active()->get();
+        return response()->json(
+            [
+                'error' => false,
+                'data' => $products,
             ],
             201
         );
