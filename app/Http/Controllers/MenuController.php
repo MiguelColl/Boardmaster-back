@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\MenuResource;
+use App\Models\Menu;
+
 class MenuController extends Controller
 {
     /**
@@ -9,14 +12,14 @@ class MenuController extends Controller
      */
     public function index()
     {
-        \Log::info('GET - /menu/ - Display a listing of the menu');
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Display a listing of the menu'
-            ],
-            200
-        );
+        $menus = Menu::base()->get();
+
+        foreach ($menus as $menu) {
+            $items = Menu::subMenu($menu->path)->get();
+            $menu->items = MenuResource::collection($items);
+        }
+
+        return MenuResource::collection($menus);
     }
 
     /**
@@ -24,13 +27,11 @@ class MenuController extends Controller
      */
     public function show(string $id)
     {
-        \Log::info("GET - /menu/$id - Display the specified menu");
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Display the specified menu'
-            ],
-            200
-        );
+        $menu = Menu::findOrFail($id);
+
+        $items = Menu::subMenu($menu->path)->get();
+        $menu->items = MenuResource::collection($items);
+
+        return new MenuResource($menu);
     }
 }

@@ -23,11 +23,17 @@ class ProductModelFactory extends Factory
 
         $name = fake()->productName();
 
+        $images = [];
+        $numImages = rand(1, 3);
+        for ($i = 0; $i < $numImages; $i++) {
+            $images[] = fake()->imageUrl(640, 480, ['cats'], true);
+        }
+
         return [
             'code' => $code,
             'name' => $name,
             'brand' => ucfirst(fake()->word()),
-            'image' => fake()->imageUrl(640, 480, ['cats'], true),
+            'images' => $images,
             'title' => $name,
             'description' => fake()->sentence(),
             'url' => fake()->url(),

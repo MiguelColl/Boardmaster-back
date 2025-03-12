@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PaidOrder;
 use App\Services\Paypal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -45,7 +46,13 @@ class PaypalController extends Controller
         $token = $request->get('token');
         $payer = $request->get('PayerID');
         $paypal = new Paypal();
-        return $paypal->confirmOrder($token);
+        $response = $paypal->confirmOrder($token);
+
+        if ($response && $response['status'] == 'COMPLETED') {
+            event(new PaidOrder($response));
+        }
+
+        return $response;
     }
 
     public function cancel(Request $request)

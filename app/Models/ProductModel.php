@@ -14,9 +14,26 @@ class ProductModel extends Model
     protected $table = 'product_models';
     protected $guarded = [];
 
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'images' => 'array',
+        ];
+    }
+
     public function variants()
     {
         return $this->hasMany(ProductVariant::class);
+    }
+
+    public function category()
+    {
+        return $this->hasMany(Category::class, 'code', 'code');
     }
 
     public function toElastic()

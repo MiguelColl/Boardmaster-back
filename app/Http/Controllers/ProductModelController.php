@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ProductCollection;
+use App\Http\Resources\ProductResource;
 use App\Models\ProductModel;
+use Illuminate\Http\Request;
 
 class ProductModelController extends Controller
 {
@@ -11,14 +14,13 @@ class ProductModelController extends Controller
      */
     public function index()
     {
-        $products = ProductModel::active()->get();
-        return response()->json(
-            [
-                'error' => false,
-                'data' => $products,
-            ],
-            200
-        );
+        $products = ProductModel::with(['variants' => function ($q) {
+            $q->with(['stock', 'rate'])->active();
+        }])->active()
+            ->orderBy('id')
+            ->paginate(20);
+
+        return new ProductCollection($products);
     }
 
     /**
@@ -26,29 +28,40 @@ class ProductModelController extends Controller
      */
     public function show(string $id)
     {
-        \Log::info("GET - /model/$id - Display the specified model");
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Display the specified model'
-            ],
-            200
-        );
+        $product = ProductModel::where('id', $id)
+            ->with('variants', function ($q) {
+                $q->with(['stock', 'rate'])->active();
+            })->active()
+            ->first();
+
+        return $product ? new ProductResource($product) : abort(404);
     }
 
     /**
      * Display a product model by a given url.
      */
-    public function showByUrl()
+    public function showByUrl(Request $request)
     {
-        \Log::info('POST - /model/byUrl - Display a product model by a given url');
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Display a product model by a given url'
-            ],
-            200
-        );
+        $url = $request->post('url', '');
+
+        if (!$url) {
+            // return response()->json(
+            //     [
+            //         'error' => true,
+            //         'message' => 'Not valid url'
+            //     ],
+            //     400
+            // );
+            abort(400);
+        }
+
+        $product = ProductModel::where('url', $url)
+            ->with('variants', function ($q) {
+                $q->with(['stock', 'rate'])->active();
+            })->active()
+            ->first();
+
+        return $product ? new ProductResource($product) : abort(404);
     }
 
     /**

@@ -31,7 +31,7 @@ class EmailController extends Controller
      */
     public function store(Request $request)
     {
-        $request-> validate([
+        $request->validate([
             'from' => 'required|email',
             'to' => 'required|email',
             'subject' => 'required|max:255',
@@ -74,7 +74,7 @@ class EmailController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request-> validate([
+        $request->validate([
             'from' => 'required|email',
             'to' => 'required|email',
             'subject' => 'required|max:255',

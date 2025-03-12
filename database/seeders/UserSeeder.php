@@ -14,6 +14,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        DB::table('orders')->delete();
         DB::table('addresses')->delete();
         DB::table('users')->delete();
 

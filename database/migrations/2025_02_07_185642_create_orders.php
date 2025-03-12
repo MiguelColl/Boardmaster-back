@@ -40,7 +40,7 @@ return new class () extends Migration {
             $table->decimal('shipping_price', 8, 2);
             $table->decimal('shipping_tax', 8, 2);
             $table->decimal('discounted_price', 8, 2)->nullable();
-            $table->foreignId('coupon_id')->constrained()->nullOnDelete();
+            $table->foreignId('coupon_id')->nullable()->constrained()->nullOnDelete();
             $table->integer('status');
             $table->timestampsTz();
         });

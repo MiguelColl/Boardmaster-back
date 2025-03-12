@@ -34,9 +34,9 @@ class ProductSeeder extends Seeder
             Category::create([
                 'code' => $model->code,
                 'name' => $model->name,
-                'description' => fake()->sentence(),
+                'description' => $model->description,
                 'node_type' => 'model',
-                'url' => fake()->url(),
+                'url' => $model->url,
                 'path' => $categories[$catNumber]->path . '.' . $model->code,
             ]);
         }

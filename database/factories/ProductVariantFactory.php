@@ -25,7 +25,7 @@ class ProductVariantFactory extends Factory
         return [
             'sku' => '',
             'color' => '',
-            'images' => json_encode($images),
+            'images' => $images,
         ];
     }
 }

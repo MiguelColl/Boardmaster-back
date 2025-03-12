@@ -9,6 +9,7 @@ use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PaypalController;
 use App\Http\Controllers\ProductModelController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\CheckPermissionsMiddleware;
 use Illuminate\Support\Facades\Route;
@@ -72,5 +73,10 @@ Route::get('/return', [PaypalController::class, 'return'])->name('paypal.return'
 Route::get('/cancel', [PaypalController::class, 'cancel'])->name('paypal.cancel');
 
 Route::resource('emails', EmailController::class);
+
+Route::prefix('test')->group(function () {
+    Route::get('/deleteUser', [TestController::class, 'deleteUser']);
+    Route::get('/changeStatus/{status}', [TestController::class, 'changeStatus']);
+});
 
 require __DIR__ . '/auth.php';

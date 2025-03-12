@@ -10,8 +10,8 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        Schema::table('product_variants', function (Blueprint $table) {
-            $table->jsonb('images')->nullable();
+        Schema::table('users', function (Blueprint $table) {
+            $table->softDeletesTz();
         });
     }
 
@@ -20,8 +20,8 @@ return new class () extends Migration {
      */
     public function down(): void
     {
-        Schema::table('product_variants', function (Blueprint $table) {
-            $table->dropColumn('images');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropSoftDeletesTz();
         });
     }
 };

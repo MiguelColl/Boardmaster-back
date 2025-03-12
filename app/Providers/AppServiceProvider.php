@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Events\PaidOrder;
+use App\Listeners\NotifyPaidOrder;
+use App\Models\Order;
+use App\Models\User;
+use App\Observers\OrderObserver;
+use App\Observers\UserObserver;
 use Carbon\Carbon;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Database\Eloquent\Model;
@@ -29,16 +35,25 @@ class AppServiceProvider extends ServiceProvider
             return config('app.frontend_url')."/password-reset/$token?email={$notifiable->getEmailForPasswordReset()}";
         });
 
+        Model::preventLazyLoading(true);
+
+        // Formatting
         Date::serializeUsing(function ($date) {
             return $date->format(Carbon::ATOM);
         });
 
-        Model::preventLazyLoading(true);
-
+        // DB Tracing
         DB::listen(function ($query) {
             if (env('LOG_QUERY') == true) {
                 \Log::channel('query')->info(Str::replaceArray('?', $query->bindings, $query->sql));
             }
         });
+
+        // Observers
+        User::observe(UserObserver::class);
+        Order::observe(OrderObserver::class);
+
+        // Listeners | Se detectan automáticamente en Laravel 11, si se añaden se duplican
+        // Event::listen(PaidOrder::class, [NotifyPaidOrder::class, 'handle']);
     }
 }

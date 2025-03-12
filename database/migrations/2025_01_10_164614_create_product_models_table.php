@@ -16,7 +16,7 @@ return new class () extends Migration {
             $table->string('name');
             $table->string('brand')->nullable();
             $table->boolean('active')->default(true);
-            $table->string('image')->nullable();
+            $table->jsonb('images')->nullable();
             $table->string('title')->nullable();
             $table->string('description')->nullable();
             $table->string('url')->nullable();
