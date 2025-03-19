@@ -3,13 +3,13 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
+use App\Models\Comment;
 use App\Models\ProductModel;
 use App\Models\ProductVariant;
 use App\Models\Rate;
 use App\Models\Stock;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class ProductSeeder extends Seeder
 {
@@ -18,14 +18,10 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('stocks')->delete();
-        DB::table('rates')->delete();
-        DB::table('product_variants')->delete();
-        DB::table('product_models')->delete();
-
         for ($i = 0; $i < 80; $i++) {
             $model = ProductModel::factory()->create();
 
+            $this->generateComments($model);
             $this->generateVariants($model);
 
             $categories = Category::where('node_type', 'category')->orderBy('id')->get();
@@ -102,6 +98,14 @@ class ProductSeeder extends Seeder
             'discount_price' => $discount ? $discountPrice : null,
             'price_suggested' => $price,
             'sku' => $variant->sku,
+        ]);
+    }
+
+    private function generateComments($model)
+    {
+        $ammount = rand(3, 6);
+        Comment::factory($ammount)->create([
+            'product_model_id' => $model->id,
         ]);
     }
 }

@@ -16,6 +16,7 @@ return new class () extends Migration {
             $table->foreignId('product_model_id')->constrained()->nullOnDelete();
             $table->string('title');
             $table->string('comment');
+            $table->integer('rate');
             $table->boolean('validated')->default(false);
             $table->softDeletesTz();
             $table->timestamps();

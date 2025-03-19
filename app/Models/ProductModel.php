@@ -36,6 +36,16 @@ class ProductModel extends Model
         return $this->hasMany(Category::class, 'code', 'code');
     }
 
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function favorites()
+    {
+        return $this->belongsToMany(Favorite::class);
+    }
+
     public function toElastic()
     {
         return [

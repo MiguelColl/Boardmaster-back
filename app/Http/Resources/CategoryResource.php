@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class MenuResource extends JsonResource
+class CategoryResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,10 +16,14 @@ class MenuResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'active' => $this->active,
+            'code' => $this->code,
             'name' => $this->name,
+            'description' => $this->description,
             'url' => $this->url,
-            'items' => $this->whenHas('items'),
+            'path' => $this->path,
+            'items' => $this->when($this->models->isNotEmpty(), function () {
+                return new ProductCollection($this->models);
+            }, null),
         ];
     }
 }

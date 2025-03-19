@@ -2,10 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Comment extends Model
 {
+    use HasFactory;
+    use SoftDeletes;
+
     protected $table = 'comments';
     protected $guarded = [];
 
@@ -14,8 +20,13 @@ class Comment extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function variant()
+    public function model()
     {
-        return $this->belongsTo(ProductVariant::class);
+        return $this->belongsTo(ProductModel::class);
+    }
+
+    public function scopeApproved(Builder $query)
+    {
+        $query->where('validated', true);
     }
 }

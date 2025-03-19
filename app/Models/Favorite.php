@@ -14,8 +14,8 @@ class Favorite extends Model
         return $this->belongsToMany(User::class);
     }
 
-    public function variants()
+    public function models()
     {
-        return $this->belongsToMany(ProductVariant::class);
+        return $this->belongsToMany(ProductModel::class);
     }
 }

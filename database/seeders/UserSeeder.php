@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Address;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class UserSeeder extends Seeder
 {
@@ -14,10 +13,6 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('orders')->delete();
-        DB::table('addresses')->delete();
-        DB::table('users')->delete();
-
         for ($i = 0; $i < 10; $i++) {
             $user = User::factory()->create();
 

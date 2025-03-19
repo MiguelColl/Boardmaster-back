@@ -50,16 +50,6 @@ class ProductVariant extends Model
         return $this->hasMany(OrderLine::class);
     }
 
-    public function favorites()
-    {
-        return $this->belongsToMany(Favorite::class);
-    }
-
-    public function comments()
-    {
-        return $this->hasMany(Comment::class);
-    }
-
     public function scopeActive(Builder $query)
     {
         $query->where('active', true);

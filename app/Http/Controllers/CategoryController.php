@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class CategoryController extends Controller
 {
@@ -14,25 +16,21 @@ class CategoryController extends Controller
     {
         $orderBy = $request->input('orderBy', null);
         $sort = $request->input('sort', 'asc');
+        $page = $request->input('page', 1);
 
-        $category = Category::where([
-            'id' => $id,
-            'node_type' => 'category'
-        ])->active()
-        ->first();
+        return Cache::remember("category_$id-$sort-$page-$orderBy", config('constants.cache.short'), function () use ($id, $orderBy, $sort) {
+            $category = Category::where([
+                'id' => $id,
+                'node_type' => 'category'
+            ])->active()
+            ->first();
 
-        if ($category) {
-            $category->models = $this->getModels($category, $orderBy, $sort);
-        }
+            if ($category) {
+                $category->models = $this->getModels($category, $orderBy, $sort);
+            }
 
-        return response()->json(
-            [
-                'error' => !isset($category),
-                'message' => $category ? '' : 'Not found',
-                'data' => $category
-            ],
-            $category ? 200 : 404
-        );
+            return $category ? new CategoryResource($category) : abort(404);
+        });
     }
 
     /**
@@ -43,41 +41,31 @@ class CategoryController extends Controller
         $url = $request->post('url', '');
         $orderBy = $request->input('orderBy', null);
         $sort = $request->input('sort', 'asc');
+        $page = $request->input('page', 1);
 
         if (!$url) {
-            return response()->json(
-                [
-                    'error' => true,
-                    'message' => 'Not valid url'
-                ],
-                400
-            );
+            return abort(400);
         }
 
-        $category = Category::where([
-            'url' => $url,
-            'node_type' => 'category'
-        ])->active()
-            ->first();
+        return Cache::remember("category_$url-$sort-$page-$orderBy", config('constants.cache.short'), function () use ($url, $orderBy, $sort) {
+            $category = Category::where([
+                'url' => $url,
+                'node_type' => 'category'
+            ])->active()
+                ->first();
 
-        if ($category) {
-            $category->models = $this->getModels($category, $orderBy, $sort);
-        }
+            if ($category) {
+                $category->models = $this->getModels($category, $orderBy, $sort);
+            }
 
-        return response()->json(
-            [
-                'error' => !isset($category),
-                'message' => $category ? '' : 'Not found',
-                'data' => $category
-            ],
-            $category ? 200 : 404
-        );
+            return $category ? new CategoryResource($category) : abort(404);
+        });
     }
 
     private function getModels($category, $orderBy, $sort)
     {
         $models = Category::filterModels($category->path, $orderBy, $sort)
-            ->paginate(10);
+            ->paginate(config('constants.pagination'));
 
         $data = $models->getCollection()->pluck('model');
         $models->setCollection($data);

@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Redis;
 
 class ProductResource extends JsonResource
 {
@@ -17,12 +18,21 @@ class ProductResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'num_visits_today' => Redis::incr("visits_product_$this->id"),
             'name' => $this->name,
             'url' => $this->url,
             'images' => $this->images,
             'isNew' => $this->isNewProduct($this->created_at),
             'description' => $this->description,
             'brand' => $this->brand,
+            'ratings' => $this->when($this->comments->isNotEmpty(), function () {
+                $commentsRatings = $this->comments->pluck('rate')->toArray();
+
+                return [
+                    'total' => count($commentsRatings),
+                    'average' => round(array_sum($commentsRatings) / count($commentsRatings), 1),
+                ];
+            }, null),
             'products' => VariantResource::collection($this->variants),
         ];
     }

@@ -2,25 +2,40 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CommentResource;
 use App\Http\Resources\ProductCollection;
 use App\Http\Resources\ProductResource;
 use App\Models\ProductModel;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 
 class ProductModelController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request, $filterNews = false)
     {
-        $products = ProductModel::with(['variants' => function ($q) {
-            $q->with(['stock', 'rate'])->active();
-        }])->active()
-            ->orderBy('id')
-            ->paginate(20);
+        $key = $filterNews ? 'new_products' : 'products';
+        $page = $request->input('page', 1);
 
-        return new ProductCollection($products);
+        return Cache::remember("$key-$page", config('constants.cache.short'), function () use ($filterNews) {
+            $products =  ProductModel::with([
+                    'variants' => function ($q) {
+                        $q->with(['stock', 'rate'])->active();
+                    },
+                    'comments'
+                ])->active()
+                ->orderBy('id');
+
+            if ($filterNews) {
+                $products->filterByNews();
+            }
+
+            return new ProductCollection($products->paginate(config('constants.pagination')));
+        });
     }
 
     /**
@@ -28,13 +43,18 @@ class ProductModelController extends Controller
      */
     public function show(string $id)
     {
-        $product = ProductModel::where('id', $id)
-            ->with('variants', function ($q) {
-                $q->with(['stock', 'rate'])->active();
-            })->active()
-            ->first();
+        $result = Cache::remember("product_$id", config('constants.cache.short'), function () use ($id) {
+            $product = ProductModel::where('id', $id)
+                ->with('variants', function ($q) {
+                    $q->with(['stock', 'rate'])->active();
+                })->active()
+                ->first();
 
-        return $product ? new ProductResource($product) : abort(404);
+            return $product ? new ProductResource($product) : abort(404);
+        });
+
+        $this->checkNumVisits($id);
+        return $result;
     }
 
     /**
@@ -45,23 +65,21 @@ class ProductModelController extends Controller
         $url = $request->post('url', '');
 
         if (!$url) {
-            // return response()->json(
-            //     [
-            //         'error' => true,
-            //         'message' => 'Not valid url'
-            //     ],
-            //     400
-            // );
             abort(400);
         }
 
-        $product = ProductModel::where('url', $url)
-            ->with('variants', function ($q) {
-                $q->with(['stock', 'rate'])->active();
-            })->active()
-            ->first();
+        $result =  Cache::remember("product_url_$url", config('constants.cache.short'), function () use ($url) {
+            $product = ProductModel::where('url', $url)
+                ->with('variants', function ($q) {
+                    $q->with(['stock', 'rate'])->active();
+                })->active()
+                ->first();
 
-        return $product ? new ProductResource($product) : abort(404);
+            return $product ? new ProductResource($product) : abort(404);
+        });
+
+        $this->checkNumVisits($result['id']);
+        return $result;
     }
 
     /**
@@ -69,14 +87,15 @@ class ProductModelController extends Controller
      */
     public function indexComment(string $id)
     {
-        \Log::info("GET - /model/$id/comment - Display a listing of the product model comments");
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Display a listing of the product model comments'
-            ],
-            200
-        );
+        return Cache::remember("product_comments_$id", config('constants.cache.short'), function () use ($id) {
+            $product = ProductModel::where('id', $id)
+                ->with('comments', function ($q) {
+                    $q->approved()->with(['user']);
+                })->active()
+                ->first();
+
+            return $product ? CommentResource::collection($product->comments) : abort(404);
+        });
     }
 
     /**
@@ -94,15 +113,12 @@ class ProductModelController extends Controller
         );
     }
 
-    public function filterNewProducts()
+    private function checkNumVisits($productId)
     {
-        $products = ProductModel::filterByNews()->active()->get();
-        return response()->json(
-            [
-                'error' => false,
-                'data' => $products,
-            ],
-            201
-        );
+        $numVisits = "visits_product_$productId";
+        if (!Redis::exists($numVisits)) {
+            $seconds = Carbon::now()->diffInSeconds(Carbon::now()->endOfDay());
+            Redis::set($numVisits, 0, 'EX', $seconds);
+        }
     }
 }

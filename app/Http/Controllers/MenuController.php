@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\MenuResource;
 use App\Models\Menu;
+use Illuminate\Support\Facades\Cache;
 
 class MenuController extends Controller
 {
@@ -12,14 +13,16 @@ class MenuController extends Controller
      */
     public function index()
     {
-        $menus = Menu::base()->get();
+        return Cache::remember('menu', config('constants.cache.long'), function () {
+            $menus = Menu::base()->get();
 
-        foreach ($menus as $menu) {
-            $items = Menu::subMenu($menu->path)->get();
-            $menu->items = MenuResource::collection($items);
-        }
+            foreach ($menus as $menu) {
+                $items = Menu::subMenu($menu->path)->get();
+                $menu->items = MenuResource::collection($items);
+            }
 
-        return MenuResource::collection($menus);
+            return MenuResource::collection($menus);
+        });
     }
 
     /**
@@ -27,11 +30,13 @@ class MenuController extends Controller
      */
     public function show(string $id)
     {
-        $menu = Menu::findOrFail($id);
+        return Cache::remember("menu_$id", config('constants.cache.long'), function () use ($id) {
+            $menu = Menu::findOrFail($id);
 
-        $items = Menu::subMenu($menu->path)->get();
-        $menu->items = MenuResource::collection($items);
+            $items = Menu::subMenu($menu->path)->get();
+            $menu->items = MenuResource::collection($items);
 
-        return new MenuResource($menu);
+            return new MenuResource($menu);
+        });
     }
 }

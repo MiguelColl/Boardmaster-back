@@ -54,12 +54,12 @@ Route::post('/category/byUrl', [CategoryController::class, 'showByUrl']);
 
 Route::prefix('product')->group(function () {
     Route::get('/', [ProductModelController::class, 'index']);
-    Route::get('/news', [ProductModelController::class, 'filterNewProducts']);
+    Route::get('/news', [ProductModelController::class, 'index'])->defaults('filterNews', true);
 
     Route::get('/{id}', [ProductModelController::class, 'show']);
     Route::post('/byUrl', [ProductModelController::class, 'showByUrl']);
 
-    Route::get('/{id}/comment', [ProductModelController::class, 'indexComment']);
+    Route::get('/{id}/comments', [ProductModelController::class, 'indexComment']);
     Route::post('/{id}/comment', [ProductModelController::class, 'storeComment']);
 });
 
@@ -77,6 +77,7 @@ Route::resource('emails', EmailController::class);
 Route::prefix('test')->group(function () {
     Route::get('/deleteUser', [TestController::class, 'deleteUser']);
     Route::get('/changeStatus/{status}', [TestController::class, 'changeStatus']);
+    Route::get('/cache', [TestController::class, 'cache']);
 });
 
 require __DIR__ . '/auth.php';

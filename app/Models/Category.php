@@ -55,9 +55,12 @@ class Category extends Model
         }
 
         $query->with('model', function ($query) {
-            $query->with('variants', function ($query) {
-                $query->with(['stock', 'rate'])->active();
-            })->active();
+            $query->with([
+                'variants' => function ($query) {
+                    $query->with(['stock', 'rate'])->active();
+                },
+                'comments',
+            ])->active();
         });
     }
 

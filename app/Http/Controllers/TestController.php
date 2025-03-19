@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Cache;
+
 class TestController extends Controller
 {
     public function deleteUser()
@@ -37,5 +39,18 @@ class TestController extends Controller
             ],
             200
         );
+    }
+
+    public function cache()
+    {
+        return response()->json([
+            'products' => Cache::has('products'),
+            'new_products' => Cache::has('new_products'),
+            'product_81' => Cache::has('product_81'),
+            'product_comments_81' => Cache::has('product_comments_81'),
+            'product_url_http://bergstrom.com/' => Cache::has('product_url_http://bergstrom.com/'),
+            'menu' => Cache::has('menu'),
+            'menu_13' => Cache::has('menu_13'),
+        ], 200);
     }
 }

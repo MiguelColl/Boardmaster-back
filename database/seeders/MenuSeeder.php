@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Menu;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class MenuSeeder extends Seeder
 {
@@ -13,8 +12,6 @@ class MenuSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('menus')->delete();
-
         for ($i = 0; $i < 5; $i++) {
             Menu::factory()->create();
         }
