@@ -66,7 +66,7 @@ Route::prefix('product')->group(function () {
 Route::get('/menu', [MenuController::class, 'index']);
 Route::get('/menu/{id}', [MenuController::class, 'show']);
 
-Route::post('/search', [SearchController::class, 'search'])->name('search');
+Route::get('/search', [SearchController::class, 'search'])->name('search');
 
 Route::get('/payment', [PaypalController::class, 'payment'])->name('paypal.payment');
 Route::get('/return', [PaypalController::class, 'return'])->name('paypal.return');

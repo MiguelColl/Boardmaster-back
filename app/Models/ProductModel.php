@@ -68,4 +68,20 @@ class ProductModel extends Model
     {
         $query->where('active', true);
     }
+
+    public function scopeSearch(Builder $query, $search)
+    {
+        $query->where('name', 'ilike', "%$search%")
+            ->orWhere('brand', 'ilike', "%$search%");
+    }
+
+    public function scopeLoadRelations(Builder $query)
+    {
+        $query->with([
+            'variants' => function ($q) {
+                $q->with(['stock', 'rate'])->active();
+            },
+            'comments'
+        ]);
+    }
 }

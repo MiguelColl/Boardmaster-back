@@ -22,12 +22,8 @@ class ProductModelController extends Controller
         $page = $request->input('page', 1);
 
         return Cache::remember("$key-$page", config('constants.cache.short'), function () use ($filterNews) {
-            $products =  ProductModel::with([
-                    'variants' => function ($q) {
-                        $q->with(['stock', 'rate'])->active();
-                    },
-                    'comments'
-                ])->active()
+            $products =  ProductModel::loadRelations()
+                ->active()
                 ->orderBy('id');
 
             if ($filterNews) {
@@ -44,17 +40,14 @@ class ProductModelController extends Controller
     public function show(string $id)
     {
         $result = Cache::remember("product_$id", config('constants.cache.short'), function () use ($id) {
-            $product = ProductModel::where('id', $id)
-                ->with('variants', function ($q) {
-                    $q->with(['stock', 'rate'])->active();
-                })->active()
+            return ProductModel::where('id', $id)
+                ->loadRelations()
+                ->active()
                 ->first();
-
-            return $product ? new ProductResource($product) : abort(404);
         });
 
-        $this->checkNumVisits($id);
-        return $result;
+        $result->numVisits = $this->checkNumVisits($id);
+        return $result ? new ProductResource($result) : abort(404);
     }
 
     /**
@@ -69,17 +62,14 @@ class ProductModelController extends Controller
         }
 
         $result =  Cache::remember("product_url_$url", config('constants.cache.short'), function () use ($url) {
-            $product = ProductModel::where('url', $url)
-                ->with('variants', function ($q) {
-                    $q->with(['stock', 'rate'])->active();
-                })->active()
+            return ProductModel::where('url', $url)
+                ->loadRelations()
+                ->active()
                 ->first();
-
-            return $product ? new ProductResource($product) : abort(404);
         });
 
-        $this->checkNumVisits($result['id']);
-        return $result;
+        $result->numVisits = $this->checkNumVisits($result['id']);
+        return $result ? new ProductResource($result) : abort(404);
     }
 
     /**
@@ -120,5 +110,7 @@ class ProductModelController extends Controller
             $seconds = Carbon::now()->diffInSeconds(Carbon::now()->endOfDay());
             Redis::set($numVisits, 0, 'EX', $seconds);
         }
+
+        return Redis::incr($numVisits);
     }
 }

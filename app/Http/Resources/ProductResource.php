@@ -5,7 +5,6 @@ namespace App\Http\Resources;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Redis;
 
 class ProductResource extends JsonResource
 {
@@ -18,7 +17,7 @@ class ProductResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'num_visits_today' => Redis::incr("visits_product_$this->id"),
+            'num_visits_today' => $this->when(isset($this->numVisits), $this->numVisits),
             'name' => $this->name,
             'url' => $this->url,
             'images' => $this->images,
