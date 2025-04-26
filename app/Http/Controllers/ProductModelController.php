@@ -21,7 +21,7 @@ class ProductModelController extends Controller
         $key = $filterNews ? 'new_products' : 'products';
         $page = $request->input('page', 1);
 
-        return Cache::remember("$key-$page", config('constants.cache.short'), function () use ($filterNews) {
+        return Cache::remember($key . "_$page", config('constants.cache.short'), function () use ($filterNews) {
             $products =  ProductModel::loadRelations()
                 ->active()
                 ->orderBy('id');

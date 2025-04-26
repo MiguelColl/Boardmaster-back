@@ -44,13 +44,46 @@ class TestController extends Controller
     public function cache()
     {
         return response()->json([
-            'products' => Cache::has('products'),
-            'new_products' => Cache::has('new_products'),
+            'products' => Cache::has('products_1'),
+            'new_products' => Cache::has('new_products_1'),
             'product_81' => Cache::has('product_81'),
             'product_comments_81' => Cache::has('product_comments_81'),
             'product_url_http://bergstrom.com/' => Cache::has('product_url_http://bergstrom.com/'),
             'menu' => Cache::has('menu'),
             'menu_13' => Cache::has('menu_13'),
+            'search_eos' => Cache::has('search_eos_1'),
         ], 200);
+    }
+
+    public function changeModel($action)
+    {
+        switch ($action) {
+            case 'insert':
+                $model = \App\Models\ProductModel::create([
+                    'id' => 9999,
+                    'code' => '9999-9999',
+                    'name' => 'Product Test',
+                    'description' => 'Test Description'
+                ]);
+                break;
+            case 'update':
+                $model = \App\Models\ProductModel::findOrFail(9999);
+                $model->brand = fake()->word();
+                $model->update();
+                break;
+            case 'delete':
+                $model = \App\Models\ProductModel::findOrFail(9999);
+                $model->delete();
+                break;
+        }
+
+        return response()->json(
+            [
+                'error' => false,
+                'action' => $action,
+                'model' => $model,
+            ],
+            200
+        );
     }
 }

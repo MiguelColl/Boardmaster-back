@@ -5,8 +5,10 @@ namespace App\Providers;
 use App\Events\PaidOrder;
 use App\Listeners\NotifyPaidOrder;
 use App\Models\Order;
+use App\Models\ProductModel;
 use App\Models\User;
 use App\Observers\OrderObserver;
+use App\Observers\ProductModelObserver;
 use App\Observers\UserObserver;
 use Carbon\Carbon;
 use Illuminate\Auth\Notifications\ResetPassword;
@@ -52,6 +54,7 @@ class AppServiceProvider extends ServiceProvider
         // Observers
         User::observe(UserObserver::class);
         Order::observe(OrderObserver::class);
+        ProductModel::observe(ProductModelObserver::class);
 
         // Listeners | Se detectan automáticamente en Laravel 11, si se añaden se duplican
         // Event::listen(PaidOrder::class, [NotifyPaidOrder::class, 'handle']);

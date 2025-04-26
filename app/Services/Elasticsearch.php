@@ -35,15 +35,20 @@ class Elasticsearch
         ]);
     }
 
-    public function search(string $query, Model $model)
+    public function search(string $query, int $page, Model $model)
     {
         return $this->client->search([
             'index' => $model->getTable(),
             'type' => '_search',
             'body' => [
+                'from' => ($page - 1) * config('constants.pagination'),
+                'size' => config('constants.pagination'),
                 'query' => [
-                    'match' => [
-                        'name' => $query
+                    'multi_match' => [
+                        'query' => $query,
+                        'fields' => ['name', 'brand'],
+                        // 'fuzziness' => 2,
+                        'type' => 'phrase_prefix',
                     ],
                 ],
             ],

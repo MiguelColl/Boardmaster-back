@@ -14,6 +14,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Middleware\CheckPermissionsMiddleware;
 use Illuminate\Support\Facades\Route;
 
+require __DIR__ . '/auth.php';
+
 Route::get('/', function () {
     return ['Laravel' => app()->version()];
 });
@@ -78,6 +80,5 @@ Route::prefix('test')->group(function () {
     Route::get('/deleteUser', [TestController::class, 'deleteUser']);
     Route::get('/changeStatus/{status}', [TestController::class, 'changeStatus']);
     Route::get('/cache', [TestController::class, 'cache']);
+    Route::get('/changeModel/{action}', [TestController::class, 'changeModel']);
 });
-
-require __DIR__ . '/auth.php';
