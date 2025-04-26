@@ -12,12 +12,13 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\CheckPermissionsMiddleware;
+use App\Services\Login;
 use Illuminate\Support\Facades\Route;
 
 require __DIR__ . '/auth.php';
 
 Route::get('/', function () {
-    return ['Laravel' => app()->version()];
+    return Login::getInfo();
 });
 
 Route::prefix('cart')->group(function () {
