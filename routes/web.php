@@ -71,7 +71,7 @@ Route::get('/menu/{id}', [MenuController::class, 'show']);
 
 Route::get('/search', [SearchController::class, 'search'])->name('search');
 
-Route::get('/payment', [PaypalController::class, 'payment'])->name('paypal.payment');
+Route::get('/payment/{ammount?}', [PaypalController::class, 'payment'])->name('paypal.payment');
 Route::get('/return', [PaypalController::class, 'return'])->name('paypal.return');
 Route::get('/cancel', [PaypalController::class, 'cancel'])->name('paypal.cancel');
 

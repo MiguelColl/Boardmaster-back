@@ -11,12 +11,12 @@ use Illuminate\Support\Str;
 
 class PaypalController extends Controller
 {
-    public function payment(Request $request)
+    public function payment(Request $request, $ammount = 10)
     {
         $paypal = new Paypal();
 
         $invoice = Str::random();
-        $total = 10.00;
+        $total = floatval($ammount);
         $ngrok = config('services.ngrok.url');
         $return = $ngrok . '/return';
         $cancel = $ngrok . '/cancel';
