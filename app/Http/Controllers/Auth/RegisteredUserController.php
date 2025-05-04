@@ -4,9 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Enums\Gender;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\LoginResource;
 use App\Models\User;
-use App\Services\Login;
-use Carbon\Carbon;
 use Closure;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -44,13 +43,12 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->string('password')),
             'birthday' => $request->birthday,
             'gender' => $request->gender,
-            'login_at' => Carbon::now(),
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return response()->json(Login::getInfo());
+        return new LoginResource($request->user());
     }
 }

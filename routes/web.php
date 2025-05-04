@@ -12,26 +12,22 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\CheckPermissionsMiddleware;
-use App\Services\Login;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 require __DIR__ . '/auth.php';
 
 Route::get('/', function () {
-    return Login::getInfo();
+    return new App\Http\Resources\LoginResource(Auth::user());
 });
 
 Route::prefix('cart')->group(function () {
-    Route::post('/', [CartController::class, 'store']);
-    Route::get('/{id}', [CartController::class, 'show']);
+    Route::get('/', [CartController::class, 'show']);
+    Route::post('/product/{id}', [CartController::class, 'storeProduct']);
+    Route::delete('/lines', [CartController::class, 'destroyCartLines']);
 
-    Route::post('/{id}/product', [CartController::class, 'storeProduct']);
-    Route::put('/{id}/product', [CartController::class, 'updateProduct']);
-
-    Route::delete('/{cartId}/line/{lineId}', [CartController::class, 'destroyProductLine']);
-
-    Route::post('/{id}/coupon', [CartController::class, 'storeCoupon']);
-    Route::delete('/{id}/coupon', [CartController::class, 'destroyCoupon']);
+    Route::post('/coupon/{code}', [CartController::class, 'storeCoupon']);
+    Route::delete('/coupon', [CartController::class, 'destroyCoupon']);
 });
 
 Route::post('/checkout', [CheckoutController::class, 'store']);

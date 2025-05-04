@@ -27,12 +27,12 @@ class ProductVariant extends Model
 
     public function model()
     {
-        return $this->belongsTo(ProductModel::class);
+        return $this->belongsTo(ProductModel::class, 'product_model_id');
     }
 
-    public function line()
+    public function cartLines()
     {
-        return $this->hasOne(CartLine::class);
+        return $this->hasMany(CartLine::class);
     }
 
     public function stock()
@@ -45,7 +45,7 @@ class ProductVariant extends Model
         return $this->hasOne(Rate::class);
     }
 
-    public function lines()
+    public function orderLines()
     {
         return $this->hasMany(OrderLine::class);
     }

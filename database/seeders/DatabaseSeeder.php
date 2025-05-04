@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
         DB::table('rates')->delete();
         DB::table('product_variants')->delete();
         DB::table('product_models')->delete();
+        DB::table('coupons')->delete();
 
         $this->call([
             UserSeeder::class,
@@ -36,6 +37,7 @@ class DatabaseSeeder extends Seeder
             ShopSeeder::class,
             MenuSeeder::class,
             OrderSeeder::class,
+            CouponSeeder::class,
         ]);
     }
 }

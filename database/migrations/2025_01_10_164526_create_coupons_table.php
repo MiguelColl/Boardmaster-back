@@ -18,6 +18,7 @@ return new class () extends Migration {
             $table->string('code');
             $table->boolean('used')->default(false);
             $table->string('type');
+            $table->decimal('ammount', 8, 2);
             $table->softDeletesTz();
             $table->timestampsTz();
         });

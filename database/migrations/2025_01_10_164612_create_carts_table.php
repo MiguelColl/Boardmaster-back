@@ -14,8 +14,8 @@ return new class () extends Migration {
             $table->id();
             $table->uuid('uuid')->unique();
             $table->boolean('active')->default(true);
-            $table->foreignId('user_id')->constrained()->nullOnDelete();
-            $table->foreignId('coupon_id')->constrained()->nullOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('coupon_id')->nullable()->constrained()->nullOnDelete();
             $table->softDeletesTz();
             $table->timestampsTz();
         });

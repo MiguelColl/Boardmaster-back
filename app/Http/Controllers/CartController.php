@@ -2,38 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CartResource;
+use App\Services\CartService;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
     /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        \Log::info('POST - /cart - Store a newly created cart in storage');
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Store a newly created cart in storage'
-            ],
-            201
-        );
-    }
-
-    /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show()
     {
-        \Log::info("GET - /cart/$id - Display the specified cart");
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Display the specified cart'
-            ],
-            200
-        );
+        $cart = CartService::getCart();
+        return new CartResource($cart->loadRelations());
     }
 
     /**
@@ -41,73 +22,35 @@ class CartController extends Controller
      */
     public function storeProduct(Request $request, string $id)
     {
-        \Log::info("POST - /cart/$id/product - Store a product in the cart");
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Store a product in the cart'
-            ],
-            201
-        );
+        $qty = $request->post('qty', 0);
+        $cart = CartService::addOrUpdateProduct($id, $qty);
+        return new CartResource($cart->loadRelations());
     }
 
     /**
-     * Update a specific product in the cart.
+     * Remove all product lines of a cart.
      */
-    public function updateProduct(Request $request, string $id)
+    public function destroyCartLines()
     {
-        \Log::info("PUT - /cart/$id/product - Update a specific product in the cart");
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Update a specific product in the cart'
-            ],
-            201
-        );
-    }
-
-    /**
-     * Remove a specific product line of a cart.
-     */
-    public function destroyProductLine(string $cartId, string $lineId)
-    {
-        \Log::info("DELETE - /cart/$cartId/line/$lineId - Remove a specific product line of a cart");
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Remove a specific product line of a cart'
-            ],
-            204
-        );
+        $cart = CartService::clearCart();
+        return new CartResource($cart);
     }
 
     /**
      * Store a new coupon.
      */
-    public function storeCoupon(Request $request, string $id)
+    public function storeCoupon(Request $request, string $code)
     {
-        \Log::info("POST - /cart/$id/coupon - Store a new coupon");
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Store a new coupon'
-            ],
-            201
-        );
+        $cart = CartService::addCoupon($code);
+        return new CartResource($cart->loadRelations());
     }
 
     /**
      * Remove a specific coupon.
      */
-    public function destroyCoupon(string $id)
+    public function destroyCoupon()
     {
-        \Log::info("DELETE - /cart/$id/coupon - Remove a specific coupon");
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Remove a specific coupon'
-            ],
-            204
-        );
+        $cart = CartService::removeCoupon();
+        return new CartResource($cart->loadRelations());
     }
 }

@@ -6,4 +6,5 @@ return [
         'long' => 300, // 5 minutes
     ],
     'pagination' => 20,
+    'iva' => 0.21,
 ];
