@@ -133,6 +133,11 @@ return [
             'level' => 'info'
         ],
 
+        'sentry' => [
+            'driver' => 'sentry' ,
+            'level' => env('LOG_LEVEL', 'error'),
+            'bubble' => true
+        ],
     ],
 
 ];

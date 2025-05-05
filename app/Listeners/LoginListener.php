@@ -28,6 +28,7 @@ class LoginListener
         $user->update([
             'login_at' => Carbon::now(),
         ]);
+        \Log::channel('sentry')->info("[LOGIN] User $user->id: $user->name logged.");
 
         if (session()->has('cart_id')) {
             $guestCart = Cart::with('lines')->find(session('cart_id'));

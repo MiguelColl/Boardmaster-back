@@ -16,6 +16,7 @@
         "laravel/tinker": "^2.9",
         "mbezhanov/faker-provider-collection": "^2.0",
         "phpdocumentor/shim": "^3.6",
+        "sentry/sentry-laravel": "^4.13",
         "xvladqt/faker-lorem-flickr": "^1.0"
     },
     "require-dev": {
