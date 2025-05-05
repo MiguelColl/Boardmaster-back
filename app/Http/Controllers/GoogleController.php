@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\LoginResource;
 use App\Models\User;
-use App\Services\Login;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Auth\Events\Registered;
@@ -44,6 +44,6 @@ class GoogleController extends Controller
 
         Auth::login($user);
 
-        return response()->json(Login::getInfo());
+        return new LoginResource($user);
     }
 }
