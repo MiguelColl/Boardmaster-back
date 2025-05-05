@@ -2,7 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderCreated;
+use App\Mail\OrderSended;
+use App\Mail\UnsubscribedUser;
+use App\Models\Order;
+use App\Models\User;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Http\Request;
 
 class TestController extends Controller
 {
@@ -22,7 +29,7 @@ class TestController extends Controller
 
     public function changeStatus($status)
     {
-        $order = \App\Models\Order::firstOrFail();
+        $order = Order::firstOrFail();
 
         if (is_numeric($status)) {
             $order->status = (int) $status;
@@ -85,5 +92,28 @@ class TestController extends Controller
             ],
             200
         );
+    }
+
+    public function testEmail(Request $request, $action)
+    {
+        $send = filter_var($request->input('send', false), FILTER_VALIDATE_BOOLEAN);
+        $order = Order::with('lines')->findOrFail(3);
+
+        switch ($action) {
+            case 'orderCreated':
+                $email = new OrderCreated($order);
+                break;
+            case 'orderSended':
+                $email = new OrderSended($order);
+                break;
+            case 'unsubscribedUser':
+                $email = new UnsubscribedUser(User::first());
+        }
+
+        if ($send) {
+            Mail::send($email);
+        }
+
+        return $email;
     }
 }

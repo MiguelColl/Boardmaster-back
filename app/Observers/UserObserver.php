@@ -2,7 +2,9 @@
 
 namespace App\Observers;
 
+use App\Mail\UnsubscribedUser;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 
 class UserObserver
 {
@@ -27,7 +29,7 @@ class UserObserver
      */
     public function deleted(User $user): void
     {
-        \Log::info("User [$user->id] $user->name has been unsubscribed");
+        Mail::send(new UnsubscribedUser($user));
     }
 
     /**

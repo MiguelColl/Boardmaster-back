@@ -78,4 +78,7 @@ Route::prefix('test')->group(function () {
     Route::get('/changeStatus/{status}', [TestController::class, 'changeStatus']);
     Route::get('/cache', [TestController::class, 'cache']);
     Route::get('/changeModel/{action}', [TestController::class, 'changeModel']);
+    Route::get('/email/orderCreated', [TestController::class, 'testEmail'])->defaults('action', 'orderCreated');
+    Route::get('/email/orderSended', [TestController::class, 'testEmail'])->defaults('action', 'orderSended');
+    Route::get('/email/unsubscribedUser', [TestController::class, 'testEmail'])->defaults('action', 'unsubscribedUser');
 });
