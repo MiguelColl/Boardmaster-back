@@ -61,12 +61,7 @@ class User extends Authenticatable
     {
         return Attribute::make(
             set: function ($value) {
-                switch ($value) {
-                    case 0: return Gender::MALE;
-                    case 1: return Gender::FEMALE;
-                    case 2: return Gender::NO_BINARY;
-                    case 3: return Gender::NO_SPECIFIED;
-                }
+                return Gender::cases()[$value];
             }
         );
     }

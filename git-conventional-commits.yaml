@@ -23,6 +23,7 @@ convention:
     'users',
     'shops',
     'database',
+    'cms',
   ]
   releaseTagGlobPattern: v[0-9]*.[0-9]*.[0-9]*
 changelog:

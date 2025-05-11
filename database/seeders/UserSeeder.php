@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Address;
 use App\Models\User;
+use App\Models\UserCms;
 use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
@@ -21,5 +22,7 @@ class UserSeeder extends Seeder
                 'shop_id' => null,
             ]);
         }
+
+        UserCms::factory()->create();
     }
 }

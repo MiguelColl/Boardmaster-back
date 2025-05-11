@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
         DB::table('addresses')->delete();
         DB::table('comments')->delete();
         DB::table('users')->delete();
+        DB::table('users_cms')->delete();
         DB::table('stocks')->delete();
         DB::table('rates')->delete();
         DB::table('product_variants')->delete();
