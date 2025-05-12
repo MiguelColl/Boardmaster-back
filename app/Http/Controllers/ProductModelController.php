@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Resources\CommentResource;
 use App\Http\Resources\ProductCollection;
 use App\Http\Resources\ProductResource;
+use App\Models\Comment;
 use App\Models\ProductModel;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 
@@ -91,16 +93,25 @@ class ProductModelController extends Controller
     /**
      * Store a product model comment.
      */
-    public function storeComment(string $id)
+    public function storeComment(Request $request, string $id)
     {
-        \Log::info("POST - /model/$id/comment - Store a product model comment");
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Store a product model comment'
-            ],
-            201
-        );
+        $product = ProductModel::findOrFail($id);
+
+        $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'comment' => ['required', 'string'],
+            'rate' => ['required', 'integer', 'min:1', 'max:5'],
+        ]);
+
+        $comment = Comment::create([
+            'user_id' => Auth::user()->id,
+            'product_model_id' => $product->id,
+            'title' => $request->title,
+            'comment' => $request->comment,
+            'rate' => $request->rate,
+        ]);
+
+        return new CommentResource($comment);
     }
 
     private function checkNumVisits($productId)

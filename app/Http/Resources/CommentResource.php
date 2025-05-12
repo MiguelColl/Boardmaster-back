@@ -21,6 +21,9 @@ class CommentResource extends JsonResource
             'user' => $this->user->name,
             'score' => $this->rate,
             'date' => $this->created_at,
+            $this->mergeWhen(!$this->validated, [
+                'validated' => (bool) $this->validated,
+            ]),
         ];
     }
 }

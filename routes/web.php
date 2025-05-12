@@ -59,7 +59,7 @@ Route::prefix('product')->group(function () {
     Route::post('/byUrl', [ProductModelController::class, 'showByUrl']);
 
     Route::get('/{id}/comments', [ProductModelController::class, 'indexComment']);
-    Route::post('/{id}/comment', [ProductModelController::class, 'storeComment']);
+    Route::post('/{id}/comment', [ProductModelController::class, 'storeComment'])->middleware('auth');
 });
 
 Route::get('/menu', [MenuController::class, 'index']);

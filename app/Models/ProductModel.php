@@ -81,7 +81,9 @@ class ProductModel extends Model
             'variants' => function ($q) {
                 $q->with(['stock', 'rate'])->active();
             },
-            'comments'
+            'comments' => function ($q) {
+                $q->approved();
+            }
         ]);
     }
 }
