@@ -57,6 +57,6 @@ class PaypalController extends Controller
 
     public function cancel(Request $request)
     {
-        return 'funciono';
+        return Redirect::to('/');
     }
 }
