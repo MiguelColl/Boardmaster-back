@@ -6,7 +6,7 @@ use App\Enums\Gender;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\LoginResource;
 use App\Models\User;
-use Closure;
+use App\Rules\EmailAlias;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,13 +24,14 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class,
-                function (string $attribute, mixed $value, Closure $fail) {
-                    $email = explode('@', $value)[0];
-                    if (strpos($email, '+') != false) {
-                        $fail("The {$attribute} cannot contain '+' characters.");
-                    }
-                },
+            'email' => [
+                'required',
+                'string',
+                'lowercase',
+                'email',
+                'max:255',
+                'unique:' . User::class,
+                new EmailAlias()
             ],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'birthday' => ['required', 'date'],

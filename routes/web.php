@@ -46,7 +46,8 @@ Route::prefix('user')->group(function () {
 });
 
 Route::post('/newsletter', [NewsletterController::class, 'store']);
-Route::delete('/newsletter', [NewsletterController::class, 'destroy']);
+Route::delete('/newsletter', [NewsletterController::class, 'destroy'])->middleware('auth');
+Route::get('/newsletter/{token}', [NewsletterController::class, 'destroyByToken']);
 
 Route::get('/category/{id}', [CategoryController::class, 'show']);
 Route::post('/category/byUrl', [CategoryController::class, 'showByUrl']);

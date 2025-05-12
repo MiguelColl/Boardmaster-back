@@ -2,7 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\NewsletterResource;
+use App\Models\Newsletter;
+use App\Rules\EmailAlias;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
+use Str;
 
 class NewsletterController extends Controller
 {
@@ -11,14 +17,24 @@ class NewsletterController extends Controller
      */
     public function store(Request $request)
     {
-        \Log::info('POST - /newsletter - Store a newly created newsletter in storage');
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Store a newly created newsletter in storage'
+        $request->validate([
+            'email' => [
+                'required',
+                'string',
+                'lowercase',
+                'email',
+                'max:255',
+                Rule::unique(Newsletter::class)->withoutTrashed(),
+                new EmailAlias(),
             ],
-            201
+        ]);
+
+        $newsletter = Newsletter::restoreOrCreate(
+            ['email' => $request->email],
+            ['token' => Str::uuid()->toString()]
         );
+
+        return new NewsletterResource($newsletter);
     }
 
     /**
@@ -26,13 +42,30 @@ class NewsletterController extends Controller
      */
     public function destroy()
     {
-        \Log::info('DELETE - /newsletter/ - Remove the specific newsletter from storage');
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Remove the specific newsletter from storage'
-            ],
-            204
-        );
+        $newsletter = Newsletter::where('email', Auth::user()->email)->first();
+
+        if ($newsletter) {
+            $newsletter->delete();
+        }
+
+        return $newsletter ? response()->noContent() : abort(404);
+    }
+
+    /**
+     * Remove the specified resource from storage by token in URL.
+     */
+    public function destroyByToken($token)
+    {
+        if (!Str::isUuid($token)) {
+            abort(400);
+        }
+
+        $newsletter = Newsletter::where('token', $token)->first();
+
+        if ($newsletter) {
+            $newsletter->delete();
+        }
+
+        return $newsletter ? response()->noContent() : abort(404);
     }
 }
