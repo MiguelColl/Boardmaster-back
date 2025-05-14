@@ -22,8 +22,10 @@ class ProductModelController extends Controller
     {
         $key = $filterNews ? 'new_products' : 'products';
         $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', config('constants.pagination'));
+        $keyName = $key . "_page-$page" . "_perPage-$perPage";
 
-        return Cache::remember($key . "_$page", config('constants.cache.short'), function () use ($filterNews) {
+        return Cache::remember($keyName, config('constants.cache.short'), function () use ($filterNews, $perPage) {
             $products =  ProductModel::loadRelations()
                 ->active()
                 ->orderBy('id');
@@ -32,7 +34,7 @@ class ProductModelController extends Controller
                 $products->filterByNews();
             }
 
-            return new ProductCollection($products->paginate(config('constants.pagination')));
+            return new ProductCollection($products->paginate($perPage));
         });
     }
 
