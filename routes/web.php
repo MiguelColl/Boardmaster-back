@@ -3,7 +3,6 @@
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\EmailController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PaypalController;
@@ -71,8 +70,6 @@ Route::get('/search', [SearchController::class, 'search'])->name('search');
 Route::get('/payment/{ammount?}', [PaypalController::class, 'payment'])->name('paypal.payment');
 Route::get('/return', [PaypalController::class, 'return'])->name('paypal.return');
 Route::get('/cancel', [PaypalController::class, 'cancel'])->name('paypal.cancel');
-
-Route::resource('emails', EmailController::class);
 
 Route::prefix('test')->group(function () {
     Route::get('/deleteUser', [TestController::class, 'deleteUser']);
