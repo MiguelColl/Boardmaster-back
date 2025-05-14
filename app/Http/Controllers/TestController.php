@@ -51,8 +51,8 @@ class TestController extends Controller
     public function cache()
     {
         return response()->json([
-            'products' => Cache::has('products_1'),
-            'new_products' => Cache::has('new_products_1'),
+            'products' => Cache::has('products_page-1_perPage-20'),
+            'new_products' => Cache::has('new_products_page-1_perPage-20'),
             'product_81' => Cache::has('product_81'),
             'product_comments_81' => Cache::has('product_comments_81'),
             'product_url_http://bergstrom.com/' => Cache::has('product_url_http://bergstrom.com/'),
