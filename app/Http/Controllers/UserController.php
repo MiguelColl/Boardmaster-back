@@ -2,112 +2,146 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Gender;
+use App\Http\Resources\CommentResource;
+use App\Http\Resources\OrderResource;
+use App\Http\Resources\ProductResource;
+use App\Http\Resources\UserResource;
+use App\Models\ProductModel;
+use App\Models\User;
+use App\Rules\EmailAlias;
+use Illuminate\Validation\Rules;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        \Log::info("PUT - /user/$id - Update the specified user in storage");
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Update the specified user in storage'
+        /** @var User $user */
+        $user = Auth::user();
+
+        $request->validate([
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'email' => [
+                'sometimes',
+                'string',
+                'lowercase',
+                'email',
+                'max:255',
+                'unique:' . User::class,
+                new EmailAlias()
             ],
-            201
-        );
+            'password' => ['sometimes', 'confirmed', Rules\Password::defaults()],
+            'birthday' => ['sometimes', 'date'],
+            'gender' => ['sometimes', 'integer', 'min:0', 'max:' . (count(Gender::cases()) - 1)],
+        ]);
+
+        $data = $request->only(['name', 'email', 'password', 'birthday', 'gender']);
+
+        if (isset($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        }
+
+        $user->update($data);
+
+        return new UserResource($user);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy()
     {
-        \Log::info("DELETE - /user/$id - Remove the specific user from storage");
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Remove the specific user from storage'
-            ],
-            204
-        );
+        /** @var User $user */
+        $user = Auth::user();
+
+        $user->delete();
+
+        return response()->noContent();
     }
 
     /**
      * Display a list of a user's favorite products.
      */
-    public function indexFavorite(string $id)
+    public function indexFavorites()
     {
-        \Log::info("GET - /user/$id/favorite - Display a list of a user's favorite products");
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Display a list of a user\'s favorite products'
-            ],
-            200
-        );
+        /** @var User $user */
+        $user = Auth::user();
+
+        return $this->getAllFavorites($user);
     }
 
     /**
      * Store a new favorite product.
      */
-    public function storeFavorite(Request $request, string $userId, string $productId)
+    public function storeFavorite(Request $request, int $productId)
     {
-        \Log::info("POST - /user/$userId/favorite/$productId - Store a new favorite product");
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Store a new favorite product'
-            ],
-            201
-        );
+        /** @var User $user */
+        $user = Auth::user();
+
+        $product = ProductModel::findOrFail($productId);
+        $user->favorites()->syncWithoutDetaching($product->id);
+
+        return $this->getAllFavorites($user);
     }
 
     /**
      * Remove the specified favorite product.
      */
-    public function destroyFavorite(string $userId, string $productId)
+    public function destroyFavorite(int $productId)
     {
-        \Log::info("DELETE - /user/$userId/favorite/$productId - Remove the specific favorite product");
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Remove the specific favorite product'
-            ],
-            204
-        );
+        /** @var User $user */
+        $user = Auth::user();
+
+        $product = ProductModel::findOrFail($productId);
+        $user->favorites()->detach($product->id);
+
+        return $this->getAllFavorites($user);
+    }
+
+    private function getAllFavorites($user)
+    {
+        $user->load([
+            'favorites' => [
+                'variants' => [
+                    'rate',
+                    'stock',
+                ],
+                'comments',
+            ]
+        ]);
+
+        return ProductResource::collection($user->favorites);
     }
 
     /**
      * Display a list of a user's orders.
      */
-    public function indexOrders(string $id)
+    public function indexOrders()
     {
-        \Log::info("GET - /user/$id/orders - Display a list of a user's orders");
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Display a list of a user\'s orders'
-            ],
-            200
-        );
+        /** @var User $user */
+        $user = Auth::user();
+
+        $user->load('orders');
+
+        return OrderResource::collection($user->orders);
     }
 
     /**
      * Display a list of a user's comments.
      */
-    public function indexComments(string $id)
+    public function indexComments()
     {
-        \Log::info("GET - /user/$id/comments - Display a list of a user's comments");
-        return response()->json(
-            [
-                'error' => false,
-                'msg' => 'Display a list of a user\'s comments'
-            ],
-            200
-        );
+        /** @var User $user */
+        $user = Auth::user();
+
+        $user->load('comments');
+
+        return CommentResource::collection($user->comments);
     }
 }

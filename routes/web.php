@@ -10,7 +10,6 @@ use App\Http\Controllers\ProductModelController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
-use App\Http\Middleware\CheckPermissionsMiddleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -31,17 +30,16 @@ Route::prefix('cart')->group(function () {
 
 Route::post('/checkout', [CheckoutController::class, 'store']);
 
-Route::prefix('user')->group(function () {
-    Route::put('/{id}', [UserController::class, 'update']);
-    Route::delete('/{id}', [UserController::class, 'destroy'])
-        ->middleware(CheckPermissionsMiddleware::class);
+Route::prefix('user')->middleware('auth')->group(function () {
+    Route::put('/', [UserController::class, 'update']);
+    Route::delete('/', [UserController::class, 'destroy']);
 
-    Route::get('/{id}/favorite', [UserController::class, 'indexFavorite']);
-    Route::post('/{userId}/favorite/{productId}', [UserController::class, 'storeFavorite']);
-    Route::delete('/{userId}/favorite/{productId}', [UserController::class, 'destroyFavorite']);
+    Route::get('/favorites', [UserController::class, 'indexFavorites']);
+    Route::post('/favorite/{productId}', [UserController::class, 'storeFavorite']);
+    Route::delete('/favorite/{productId}', [UserController::class, 'destroyFavorite']);
 
-    Route::get('/{id}/orders', [UserController::class, 'indexOrders']);
-    Route::get('/{id}/comments', [UserController::class, 'indexComments']);
+    Route::get('/orders', [UserController::class, 'indexOrders']);
+    Route::get('/comments', [UserController::class, 'indexComments']);
 });
 
 Route::post('/newsletter', [NewsletterController::class, 'store']);
