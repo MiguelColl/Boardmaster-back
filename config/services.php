@@ -38,6 +38,8 @@ return [
     'elastic' => [
         'enabled' => env('ELASTICSEARCH_ENABLED', false),
         'hosts' => explode(',', env('ELASTICSEARCH_HOSTS')),
+        'user' => env('ELASTICSEARCH_USER', ''),
+        'password' => env('ELASTICSEARCH_PASSWORD', ''),
     ],
 
     'paypal' => [

@@ -13,6 +13,10 @@ class Elasticsearch
     {
         $this->client = ClientBuilder::create()
             ->setHosts(config('services.elastic.hosts'))
+            ->setBasicAuthentication(
+                config('services.elastic.user'),
+                config('services.elastic.password'),
+            )
             ->build();
     }
 
