@@ -26,7 +26,7 @@ class UserController extends Controller
         $user = Auth::user();
 
         $request->validate([
-            'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'name' => ['sometimes', 'string', 'max:255'],
             'email' => [
                 'sometimes',
                 'string',
