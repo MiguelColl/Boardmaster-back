@@ -24,10 +24,10 @@ class UserCmsFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => 'Miguel C.',
-            'email' => 'mikewas.cm@gmail.com',
+            'name' => env('ADMIN_NAME', 'John Doe'),
+            'email' => env('ADMIN_EMAIL', 'example@example.net'),
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('admin2025'),
+            'password' => static::$password ??= Hash::make(env('ADMIN_PASSWORD', 'password')),
             'remember_token' => Str::random(10),
         ];
     }
