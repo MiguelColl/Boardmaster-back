@@ -2,8 +2,6 @@
 
 namespace App\Providers;
 
-use App\Events\PaidOrder;
-use App\Listeners\NotifyPaidOrder;
 use App\Models\Order;
 use App\Models\ProductModel;
 use App\Models\User;
@@ -55,8 +53,5 @@ class AppServiceProvider extends ServiceProvider
         User::observe(UserObserver::class);
         Order::observe(OrderObserver::class);
         ProductModel::observe(ProductModelObserver::class);
-
-        // Listeners | Se detectan automáticamente en Laravel 11, si se añaden se duplican
-        // Event::listen(PaidOrder::class, [NotifyPaidOrder::class, 'handle']);
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Observers;
 
 use App\Enums\OrderStatus;
-use App\Mail\OrderCreated;
 use App\Mail\OrderSended;
 use App\Models\Order;
 use Illuminate\Support\Facades\Mail;
@@ -15,7 +14,7 @@ class OrderObserver
      */
     public function created(Order $order): void
     {
-        Mail::send(new OrderCreated($order));
+        //
     }
 
     /**
