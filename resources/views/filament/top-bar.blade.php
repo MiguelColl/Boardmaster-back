@@ -1,1 +1,2 @@
-{{-- <div>Incluir boton para DEEPL</div> --}}
+{{-- <div>Incluir boton para HORIZON</div> --}}
+<a href="/horizon">Acceso a Horizon</a>
