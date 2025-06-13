@@ -22,14 +22,20 @@ class Menu extends Model
         );
     }
 
-    public function scopeBase(Builder $query)
+    public function scopeBase(Builder $query, $type)
     {
-        $query->whereRaw("nlevel(path) = 1");
+        $query->whereRaw("nlevel(path) = 1")
+                ->where('node_type', $this->getNodeType($type));
     }
 
-    public function scopeSubMenu(Builder $query, $path, $level = 1)
+    public function scopeSubMenu(Builder $query, $path, $type, $level = 1)
     {
         $query->whereRaw("'$path' @> path AND nlevel(path) = nlevel('$path') + $level")
-            ->where('node_type', 'menu');
+                ->where('node_type', $this->getNodeType($type));
+    }
+
+    private function getNodeType($type)
+    {
+        return $type == 'header' ? $type : 'footer';
     }
 }

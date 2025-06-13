@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\MenuResource;
 use App\Models\Menu;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
 class MenuController extends Controller
@@ -11,13 +12,15 @@ class MenuController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Cache::remember('menu', config('constants.cache.long'), function () {
-            $menus = Menu::base()->get();
+        $menuType = $request->input('type', 'header');
+
+        return Cache::remember("menu_$menuType", config('constants.cache.long'), function () use ($menuType) {
+            $menus = Menu::base($menuType)->get();
 
             foreach ($menus as $menu) {
-                $items = Menu::subMenu($menu->path)->get();
+                $items = Menu::subMenu($menu->path, $menuType)->get();
                 $menu->items = MenuResource::collection($items);
             }
 
@@ -28,12 +31,14 @@ class MenuController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
-        return Cache::remember("menu_$id", config('constants.cache.long'), function () use ($id) {
+        $menuType = $request->input('type', 'header');
+
+        return Cache::remember("menu_$menuType-$id", config('constants.cache.long'), function () use ($id, $menuType) {
             $menu = Menu::findOrFail($id);
 
-            $items = Menu::subMenu($menu->path)->get();
+            $items = Menu::subMenu($menu->path, $menuType)->get();
             $menu->items = MenuResource::collection($items);
 
             return new MenuResource($menu);

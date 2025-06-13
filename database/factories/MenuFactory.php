@@ -26,7 +26,7 @@ class MenuFactory extends Factory
             'code' => $code,
             'name' => fake()->department(),
             'url' => fake()->url(),
-            'node_type' => 'menu',
+            'node_type' => 'header',
             'path' => $code,
         ];
     }
