@@ -174,7 +174,6 @@ class CartService
 
     private static function calcDiscount($coupon, $price)
     {
-        \Log::info(print_r($coupon, true));
         switch ($coupon->type) {
             case 'discount':
                 $discount = $coupon->ammount;
