@@ -44,6 +44,9 @@ class Cart extends Model
     public function loadRelations()
     {
         return $this->load([
+            'lines' => function ($q) {
+                $q->orderBy('id', 'asc');
+            },
             'lines.variant.model',
             'coupon',
             'user',

@@ -14,13 +14,13 @@ class MenuController extends Controller
      */
     public function index(Request $request)
     {
-        $menuType = $request->input('type', 'header');
+        $menuType = $request->input('type') ?: 'header';
 
         return Cache::remember("menu_$menuType", config('constants.cache.long'), function () use ($menuType) {
-            $menus = Menu::base($menuType)->get();
+            $menus = Menu::base($menuType)->orderBy('norder')->get();
 
             foreach ($menus as $menu) {
-                $items = Menu::subMenu($menu->path, $menuType)->get();
+                $items = Menu::subMenu($menu->path, $menuType)->orderBy('norder')->get();
                 $menu->items = MenuResource::collection($items);
             }
 

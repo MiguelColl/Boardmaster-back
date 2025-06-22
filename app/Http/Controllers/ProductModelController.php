@@ -21,8 +21,8 @@ class ProductModelController extends Controller
     public function index(Request $request, $filterNews = false)
     {
         $key = $filterNews ? 'new_products' : 'products';
-        $page = $request->input('page', 1);
-        $perPage = $request->input('perPage', config('constants.pagination'));
+        $page = $request->input('page') ?: 1;
+        $perPage = $request->input('perPage') ?: config('constants.pagination');
         $keyName = $key . "_page-$page" . "_perPage-$perPage";
 
         return Cache::remember($keyName, config('constants.cache.short'), function () use ($filterNews, $perPage) {

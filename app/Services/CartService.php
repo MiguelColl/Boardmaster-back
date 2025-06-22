@@ -42,7 +42,7 @@ class CartService
         ]);
     }
 
-    public static function addOrUpdateProduct($id, $qty)
+    public static function addOrUpdateProduct($id, $qty, $increment)
     {
         $product = ProductVariant::with('stock')->findOrFail($id);
         if ($qty > 0 && $product->stock->stock < $qty) {
@@ -55,6 +55,9 @@ class CartService
         $line = self::checkLine($cart->id, $product->id);
 
         if ($line) {
+            if ($increment) {
+                $qty = $line->units + $qty;
+            }
             $qty > 0 ? self::updateProduct($line, $qty) : $line->delete();
         } elseif ($qty > 0) {
             self::createLine($cart, $product, $qty);
@@ -144,7 +147,9 @@ class CartService
 
     private static function calcPriceCart($cart)
     {
-        $cart->load(['lines', 'coupon']);
+        $cart->load(['lines' => function ($q) {
+            $q->orderBy('id', 'asc');
+        }, 'coupon']);
 
         $taxes = 0;
         $subtotalPrice = 0;

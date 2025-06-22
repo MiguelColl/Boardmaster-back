@@ -14,9 +14,9 @@ class CategoryController extends Controller
      */
     public function show(Request $request, string $id)
     {
-        $orderBy = $request->input('orderBy', null);
-        $sort = $request->input('sort', 'asc');
-        $page = $request->input('page', 1);
+        $orderBy = $request->input('orderBy') ?: null;
+        $sort = $request->input('sort') ?: 'asc';
+        $page = $request->input('page') ?: 1;
 
         return Cache::remember("category_$id-$sort-$page-$orderBy", config('constants.cache.short'), function () use ($id, $orderBy, $sort) {
             $category = Category::where([
@@ -38,10 +38,10 @@ class CategoryController extends Controller
      */
     public function showByUrl(Request $request)
     {
-        $url = $request->post('url', '');
-        $orderBy = $request->input('orderBy', null);
-        $sort = $request->input('sort', 'asc');
-        $page = $request->input('page', 1);
+        $url = $request->post('url') ?: '';
+        $orderBy = $request->input('orderBy') ?: null;
+        $sort = $request->input('sort') ?: 'asc';
+        $page = $request->input('page') ?: 1;
 
         if (!$url) {
             return abort(400);

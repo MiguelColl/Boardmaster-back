@@ -23,7 +23,8 @@ class CartController extends Controller
     public function storeProduct(Request $request, string $id)
     {
         $qty = $request->post('qty', 0);
-        $cart = CartService::addOrUpdateProduct($id, $qty);
+        $increment = $request->post('increment') ? true : false;
+        $cart = CartService::addOrUpdateProduct($id, $qty, $increment);
         return new CartResource($cart->loadRelations());
     }
 

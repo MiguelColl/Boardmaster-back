@@ -36,7 +36,7 @@ class AdminPanelProvider extends PanelProvider
                 Pages\Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
-            ->renderHook('panels::topbar.end', fn () => view('filament.top-bar'))
+            ->renderHook('panels::user-menu.before', fn () => view('filament.top-bar'))
             ->widgets([
                 Widgets\AccountWidget::class,
             ])

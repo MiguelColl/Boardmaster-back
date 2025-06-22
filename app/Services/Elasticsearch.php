@@ -41,6 +41,7 @@ class Elasticsearch
 
     public function search(string $query, int $page, Model $model)
     {
+        // USAR UN BOOL CON DENTRO UN MUST Y DENTRO BLOQUES CON MATCH, PUEDO TENER MAS DE UN BLOQUE MATCH
         return $this->client->search([
             'index' => $model->getTable(),
             'type' => '_search',
