@@ -19,6 +19,7 @@ class CartLineResource extends JsonResource
             'product' => [
                 'id' => $this->variant->id,
                 'name' => $this->variant->model->name,
+                'code' => $this->variant->model->code,
                 'image' => $this->variant->images[0],
                 'url' => $this->variant->model->url
             ],

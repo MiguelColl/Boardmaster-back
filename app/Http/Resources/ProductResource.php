@@ -19,6 +19,7 @@ class ProductResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'code' => $this->code,
             'num_visits_today' => $this->when(isset($this->numVisits), $this->numVisits),
             'name' => $this->name,
             'url' => $this->url,
