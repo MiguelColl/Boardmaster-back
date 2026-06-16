@@ -8,6 +8,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProductResource extends JsonResource
 {
+    private static $allCategories = null;
+
     /**
      * Transform the resource into an array.
      *
@@ -24,6 +26,7 @@ class ProductResource extends JsonResource
             'isNew' => $this->isNewProduct($this->created_at),
             'description' => $this->description,
             'brand' => $this->brand,
+            'numPlayers' => $this->numPlayers,
             'ratings' => $this->when($this->comments->isNotEmpty(), function () {
                 $commentsRatings = $this->comments->pluck('rate')->toArray();
 
@@ -32,7 +35,25 @@ class ProductResource extends JsonResource
                     'average' => round(array_sum($commentsRatings) / count($commentsRatings), 1),
                 ];
             }, null),
-            'products' => VariantResource::collection($this->variants),
+            'variants' => VariantResource::collection($this->variants),
+            'categories' => $this->category->map(function ($catAssociation) {
+                if (self::$allCategories === null) {
+                    self::$allCategories = \App\Models\Category::where('node_type', 'category')
+                        ->active()
+                        ->get();
+                }
+
+                $modelPath = $catAssociation->path;
+
+                return self::$allCategories->filter(function ($c) use ($modelPath) {
+                    return str_starts_with($modelPath, $c->path . '.');
+                })->map(function ($c) {
+                    return [
+                        'name' => $c->name,
+                        'url' => $c->url,
+                    ];
+                });
+            })->collapse()->unique('url')->values()->toArray(),
         ];
     }
 

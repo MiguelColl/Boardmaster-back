@@ -23,6 +23,8 @@ return new class () extends Migration {
             $table->timestampsTz();
         });
 
+        DB::statement('CREATE EXTENSION IF NOT EXISTS ltree;');
+
         $query = 'ALTER TABLE categories ALTER COLUMN path TYPE "ltree" USING "path"::"ltree";';
         DB::statement($query);
     }

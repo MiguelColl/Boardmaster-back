@@ -17,10 +17,10 @@ class MenuController extends Controller
         $menuType = $request->input('type') ?: 'header';
 
         return Cache::remember("menu_$menuType", config('constants.cache.long'), function () use ($menuType) {
-            $menus = Menu::base($menuType)->orderBy('norder')->get();
+            $menus = Menu::base($menuType)->active()->orderBy('norder')->get();
 
             foreach ($menus as $menu) {
-                $items = Menu::subMenu($menu->path, $menuType)->orderBy('norder')->get();
+                $items = Menu::subMenu($menu->path, $menuType)->active()->orderBy('norder')->get();
                 $menu->items = MenuResource::collection($items);
             }
 
@@ -36,9 +36,9 @@ class MenuController extends Controller
         $menuType = $request->input('type', 'header');
 
         return Cache::remember("menu_$menuType-$id", config('constants.cache.long'), function () use ($id, $menuType) {
-            $menu = Menu::findOrFail($id);
+            $menu = Menu::active()->findOrFail($id);
 
-            $items = Menu::subMenu($menu->path, $menuType)->get();
+            $items = Menu::subMenu($menu->path, $menuType)->active()->get();
             $menu->items = MenuResource::collection($items);
 
             return new MenuResource($menu);

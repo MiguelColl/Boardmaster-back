@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\ProductModel;
+use App\Enums\NumPlayers;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Str;
 
@@ -40,6 +41,14 @@ class ProductModelFactory extends Factory
             $images[] = fake()->imageUrl(640, 480, ['cats'], true);
         }
 
+        $numPlayersCases = NumPlayers::cases();
+        $selectedCases = collect($numPlayersCases)->random(rand(1, count($numPlayersCases)));
+        $numPlayers = collect($numPlayersCases)
+            ->filter(fn ($case) => $selectedCases->contains($case))
+            ->map(fn ($case) => $case->value)
+            ->values()
+            ->toArray();
+
         return [
             'code' => $code,
             'name' => $name,
@@ -48,6 +57,7 @@ class ProductModelFactory extends Factory
             'title' => $name,
             'description' => fake()->sentence(),
             'url' => $url,
+            'numPlayers' => $numPlayers,
         ];
     }
 }

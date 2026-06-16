@@ -126,7 +126,7 @@ class Checkout
             'delivery_province' => $request->delivery_province,
             'delivery_country' => $request->delivery_country,
             'delivery_phone' => $request->delivery_phone,
-            'delivery_comments' => $request->delivery_comments,
+            'delivery_comments' => isset($request->delivery_comments) ? $request->delivery_comments : null,
             'bill_name' => isset($request->bill_name) ? $request->bill_name : $request->delivery_name,
             'bill_surname' => isset($request->bill_surname) ? $request->bill_surname : $request->delivery_surname,
             'bill_address' => isset($request->bill_address) ? $request->bill_address : $request->delivery_address,

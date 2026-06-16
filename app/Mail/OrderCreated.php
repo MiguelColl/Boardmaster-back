@@ -30,7 +30,7 @@ class OrderCreated extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Order Received | ' . config('app.name'),
+            subject: 'Pedido realizado | ' . config('app.name'),
             to: $this->order->email,
         );
     }

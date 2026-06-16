@@ -23,6 +23,7 @@ class ProductModel extends Model
     {
         return [
             'images' => 'array',
+            'numPlayers' => \Illuminate\Database\Eloquent\Casts\AsEnumCollection::of(\App\Enums\NumPlayers::class),
         ];
     }
 
@@ -83,7 +84,8 @@ class ProductModel extends Model
             },
             'comments' => function ($q) {
                 $q->approved();
-            }
+            },
+            'category',
         ]);
     }
 }

@@ -19,7 +19,9 @@ class CartService
 
     private static function getUserCart()
     {
-        return Auth::user()->cart ?? self::createCart();
+        $cart = Auth::user()->cart;
+
+        return $cart && $cart->active ? $cart : self::createCart();
     }
 
     private static function getGuestCart()
@@ -31,7 +33,17 @@ class CartService
             return $cart;
         }
 
-        return Cart::whereNull('user_id')->find(session('cart_id'));
+        $cart = Cart::whereNull('user_id')
+            ->where('id', session('cart_id'))
+            ->active()
+            ->first();
+
+        if (!$cart) {
+            $cart = self::createCart();
+            session(['cart_id' => $cart->id]);
+        }
+
+        return $cart;
     }
 
     private static function createCart()
@@ -48,7 +60,7 @@ class CartService
         if ($qty > 0 && $product->stock->stock < $qty) {
             abort(400, $product->stock->stock <= 0 ?
                 'This product is out of stock.' :
-                'This product has a maximum of '. $product->stock->stock . ' units.');
+                'This product has a maximum of ' . $product->stock->stock . ' units.');
         }
 
         $cart = self::getCart();

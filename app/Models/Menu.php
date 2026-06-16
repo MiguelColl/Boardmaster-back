@@ -25,13 +25,18 @@ class Menu extends Model
     public function scopeBase(Builder $query, $type)
     {
         $query->whereRaw("nlevel(path) = 1")
-                ->where('node_type', $this->getNodeType($type));
+            ->where('node_type', $this->getNodeType($type));
     }
 
     public function scopeSubMenu(Builder $query, $path, $type, $level = 1)
     {
         $query->whereRaw("'$path' @> path AND nlevel(path) = nlevel('$path') + $level")
-                ->where('node_type', $this->getNodeType($type));
+            ->where('node_type', $this->getNodeType($type));
+    }
+
+    public function scopeActive(Builder $query)
+    {
+        $query->where('active', true);
     }
 
     private function getNodeType($type)

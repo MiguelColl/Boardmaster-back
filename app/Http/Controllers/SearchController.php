@@ -27,7 +27,7 @@ class SearchController extends Controller
         try {
             $products = $this->searchElastic($q, $page);
         } catch (Exception $e) {
-            \Log::error('[ElasticSearch ERROR] '. $e->getMessage());
+            \Log::error('[ElasticSearch ERROR] ' . $e->getMessage());
             $products = $this->searchBBDD($q);
         }
 

@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Resources\CommentResource;
 use App\Http\Resources\ProductCollection;
 use App\Http\Resources\ProductResource;
+use App\Models\Category;
 use App\Models\Comment;
 use App\Models\ProductModel;
+use App\Enums\NumPlayers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,15 +25,79 @@ class ProductModelController extends Controller
         $key = $filterNews ? 'new_products' : 'products';
         $page = $request->input('page') ?: 1;
         $perPage = $request->input('perPage') ?: config('constants.pagination');
-        $keyName = $key . "_page-$page" . "_perPage-$perPage";
 
-        return Cache::remember($keyName, config('constants.cache.short'), function () use ($filterNews, $perPage) {
-            $products =  ProductModel::loadRelations()
+        $min = $request->input('min');
+        $max = $request->input('max');
+        $min = is_numeric($min) ? (float) $min : null;
+        $max = is_numeric($max) ? (float) $max : null;
+
+        $offers = $request->boolean('ofertas');
+
+        $categories = $request->input('categoria')
+            ? array_filter(array_map('trim', explode(',', $request->input('categoria'))))
+            : [];
+        $players = $request->input('jugadores')
+            ? array_filter(array_map('trim', explode(',', $request->input('jugadores'))))
+            : [];
+        $players = array_intersect(
+            $players,
+            array_map(fn ($enum) => $enum->value, NumPlayers::cases())
+        );
+
+        $filterHash = md5(json_encode([
+            'min' => $min,
+            'max' => $max,
+            'offers' => $offers,
+            'categories' => $categories,
+            'players' => $players,
+        ]));
+        $keyName = "{$key}_page-{$page}_perPage-{$perPage}_filters-{$filterHash}";
+
+        return Cache::remember($keyName, config('constants.cache.short'), function () use ($filterNews, $perPage, $min, $max, $offers, $categories, $players) {
+            $products = ProductModel::loadRelations()
                 ->active()
                 ->orderBy('id');
 
             if ($filterNews) {
                 $products->filterByNews();
+            }
+
+            if ($min !== null || $max !== null || $offers) {
+                $products->whereHas('variants', function ($q) use ($min, $max, $offers) {
+                    $q->active()->whereHas('rate', function ($q) use ($min, $max, $offers) {
+                        if ($min !== null) {
+                            $q->whereRaw('COALESCE(discount_price, price) >= ?', [$min]);
+                        }
+                        if ($max !== null) {
+                            $q->whereRaw('COALESCE(discount_price, price) <= ?', [$max]);
+                        }
+                        if ($offers) {
+                            $q->whereNotNull('discount_price');
+                        }
+                    });
+                });
+            }
+
+            if (!empty($categories)) {
+                $categoryPaths = Category::whereIn('code', $categories)
+                    ->where('node_type', 'category')
+                    ->active()
+                    ->pluck('path');
+
+                if ($categoryPaths->isNotEmpty()) {
+                    foreach ($categoryPaths as $path) {
+                        $products->whereHas('category', function ($q) use ($path) {
+                            $q->where('node_type', 'model')
+                                ->whereRaw('? @> path', [$path]);
+                        });
+                    }
+                }
+            }
+
+            if (!empty($players)) {
+                foreach ($players as $numPlayers) {
+                    $products->whereJsonContains('numPlayers', $numPlayers);
+                }
             }
 
             return new ProductCollection($products->paginate($perPage));
